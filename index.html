@@ -1,0 +1,293 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Contact Details confirmation form</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- Firebase SDK -->
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-auth.js"></script>
+
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f5f5f5;
+            margin: 0;
+            padding: 20px;
+        }
+        .form-container {
+            background: #ffffff;
+            padding: 25px;
+            border-radius: 8px;
+            max-width: 500px;
+            margin: 0 auto;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+        h2 {
+            text-align: center;
+            color: #333;
+        }
+        .form-group {
+            margin-bottom: 18px;
+        }
+        label {
+            display: block;
+            margin-bottom: 6px;
+            font-weight: bold;
+        }
+        input, select, button {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+        }
+        input:disabled, select:disabled {
+            background-color: #e9e9e9;
+        }
+        .resume-upload {
+            margin-top: 10px;
+        }
+        button {
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            font-size: 16px;
+            cursor: pointer;
+        }
+        button:disabled {
+            background-color: #aaa;
+            cursor: not-allowed;
+        }
+        .error {
+            color: red;
+            font-size: 14px;
+            margin-top: 6px;
+        }
+        #recaptcha-container {
+            margin-top: 10px;
+            margin-bottom: 10px;
+        }
+        .otp-section {
+            margin-top: 10px;
+        }
+    </style>
+</head>
+<body>
+
+<div class="form-container">
+    <h2>Internship Student Contact Details confirmation form with OTP Verification</h2>
+    <form id="teacherForm" enctype="multipart/form-data">
+        <!-- Name Field -->
+        <div class="form-group">
+            <label for="student-name">Select Your Name:</label>
+            <select id="student-name" name="student-name" required>
+                <option value="" disabled selected>Select Your Name</option>
+                <option value="Chongwain Bisheline Naya">Chongwain Bisheline Naya</option>
+                <option value="Chongwain Marice Sang">Chongwain Marice Sang</option>
+                <option value="Dorcas Favor Neng Achu">Dorcas Favor Neng Achu</option>
+                <option value="Mbah Sally Atock">Mbah Sally Atock</option>
+                <option value="Fadimatou Jara">Fadimatou Jara</option>
+                <option value="Nfou Florence Nange">Nfou Florence Nange</option>
+                <option value="Yuh Michael Tim">Yuh Michael Tim</option>
+                <option value="Sijinge Juliet Mensily">Sijinge Juliet Mensily</option>
+                <option value="Kamtchebun Fogne Chanice Aimeraude">Kamtchebun Fogne Chanice Aimeraude</option>
+                <option value="Dot Konga Koss Jael">Dot Konga Koss Jael</option>
+                <option value="Bimisibom Chongsi Lusian">Bimisibom Chongsi Lusian</option>
+                <option value="Kunjong Lesley Ndokouh">Kunjong Lesley Ndokouh</option>
+            </select>
+        </div>
+ <label for="passport-number">Select Your Passport Number:</label>
+            <select id="passport-number" name="passport-number" required>
+                <option value="" disabled selected>Select Your Passport Number</option>
+                <option value="AA380207">AA380207</option>
+                <option value="AA687673">AA687673</option>
+                <option value="AB098283">AB098283</option>
+                <option value="AB108494">AB108494</option>
+                <option value="AA968947">AA968947</option>
+                <option value="AA565087">AA565087</option>
+                <option value="AB108573">AB108573</option>
+                <option value="AB111308">AB111308</option>
+                <option value="AB111103">AB111103</option>
+                <option value="AB111309">AB111309</option>
+                <option value="AB112680">AB112680</option>
+                <option value="AB113196">AB113196</option>
+            </select>
+        <!-- Email Field -->
+        <div class="form-group">
+            <label for="email">Email ID that youll be using in India:</label>
+            <input type="email" id="email" name="email" required>
+        </div>
+        <div class="form-group">
+            <label for="whatsapp">Whatsapp Number that youll be using in India:</label>
+            <input type="whatsapp" id="whatsapp" name="whatsapp" required>
+        </div>
+
+        <!-- Phone Number and OTP Verification -->
+        <div class="form-group">
+            <label for="phone">Authenticate your Existing Phone Number (Format: +1234567890):</label>
+            <input type="tel" id="phone" name="phone" required>
+            <button type="button" onclick="sendOTP()">Send OTP</button>
+            <div id="recaptcha-container"></div>
+        </div>
+
+        <div id="otpSection" class="form-group otp-section" style="display:none;">
+            <label for="otp">Enter OTP:</label>
+            <input type="text" id="otp" placeholder="Enter OTP" required>
+            <button type="button" onclick="verifyOTP()">Verify OTP</button>
+            <p id="otpError" class="error"></p>
+        </div>
+
+      
+<div class="form-group">
+    <label for="university">Select University:</label>
+    <select id="university" name="university" required>
+        <option value="St. Austin's University" selected>St. Austin's University</option>
+    </select>
+</div>
+
+       <div class="form-group">
+    <label for="course">Select Your Course:</label>
+    <select id="course" name="course" required>
+        <option value="" disabled selected>Select Your Course</option>
+        <option value="Nursing (First semester)">Nursing (First semester)</option>
+        <option value="Midwifery (First semester)">Midwifery (First semester)</option>
+        <option value="Medical Laboratory Science (First semester)">Medical Laboratory Science (First semester)</option>
+        <option value="Medical Imaging Technology (First semester)">Medical Imaging Technology (First semester)</option>
+        <option value="Sciences Infirmieres (Course in French)">Sciences Infirmieres (Course in French)</option>
+        <option value="Nursing Aid (Care Assistant)">Nursing Aid (Care Assistant)</option>
+        <option value="Pharmacy Technology">Pharmacy Technology</option>
+        <option value="Mental Health and Psychiatric Nursing">Mental Health and Psychiatric Nursing</option>
+         <option value="Dental">Dental</option>
+        <!-- Add more courses here if needed -->
+    </select>
+</div>
+
+
+
+</div>
+
+       <div class="form-group">
+    <h3>Confirmations:</h3>
+
+    <!-- Confirmation 1 -->
+    <div>
+        <input type="checkbox" id="assignmentConfirmation" name="assignmentConfirmation" required>
+        <label for="assignmentConfirmation">I reconfirm that all the information entered by me above is correct .</label>
+    </div>
+
+    <!-- Confirmation 2 -->
+    <div>
+        <input type="checkbox" id="paymentConfirmation" name="paymentConfirmation" required>
+        <label for="paymentConfirmation">I don’t have any pending payment towards St. Austin’s.</label>
+    </div>
+
+    <!-- Confirmation 3 -->
+    <div>
+        <input type="checkbox" id="availabilityConfirmation" name="availabilityConfirmation" required>
+        <label for="availabilityConfirmation">"I solemnly affirm that I will uphold the highest standards of professionalism, ethics, and patient confidentiality during my observership internship. I will strictly adhere to all hospital guidelines, maintain respect for patients and staff, and engage only in observational learning without direct medical intervention.
+
+I understand that any violation of these terms, including misconduct, breach of confidentiality, or failure to comply with hospital policies, may result in the immediate termination of my internship without any further notice." </label>
+    </div>
+</div>
+
+<!-- Submit Button -->
+        <button type="submit" id="submitBtn" disabled>Submit Application</button>
+    </form>
+</div>
+
+<script>
+    // Firebase configuration
+    const firebaseConfig = {
+        apiKey: "AIzaSyAnbPcqEU_dJjYXREg61kqaIJgUld-tUjE",
+  authDomain: "otp-ver-pr.firebaseapp.com",
+  projectId: "otp-ver-pr",
+  storageBucket: "otp-ver-pr.firebasestorage.app",
+  messagingSenderId: "440252952853",
+  appId: "1:440252952853:web:8fb5c9fa3ea6788bb7791c",
+  measurementId: "G-B7YSVKNGL5"
+    };
+
+    // Initialize Firebase
+    firebase.initializeApp(firebaseConfig);
+
+    let confirmationResult;
+    let appVerifier;
+
+    function sendOTP() {
+        const phoneNumber = document.getElementById('phone').value;
+
+        if (!phoneNumber) {
+            alert("Please enter a valid phone number.");
+            return;
+        }
+
+        // Initialize reCAPTCHA
+        if (!appVerifier) {
+            appVerifier = new firebase.auth.RecaptchaVerifier('recaptcha-container', {
+                size: 'invisible'
+            });
+        }
+
+        firebase.auth().signInWithPhoneNumber(phoneNumber, appVerifier)
+            .then((result) => {
+                confirmationResult = result;
+                document.getElementById("otpSection").style.display = "block";
+                alert("OTP sent. Please check sms on your phone.");
+            })
+            .catch((error) => {
+                console.error("Error sending OTP:", error);
+                document.getElementById('otpError').textContent = "Failed to send OTP. Please try again.";
+            });
+    }
+
+    function verifyOTP() {
+        const otp = document.getElementById('otp').value;
+
+        if (!otp) {
+            alert("Please enter the OTP.");
+            return;
+        }
+
+        confirmationResult.confirm(otp)
+            .then((result) => {
+                alert("Phone number verified successfully! You can proceed with form submission now ");
+                document.getElementById('otpError').textContent = ""; // Clear any previous errors
+                document.getElementById('otpSection').style.display = "none";
+                document.getElementById('phone').disabled = true;
+                document.querySelector('button[onclick="sendOTP()"]').disabled = true;
+                document.getElementById('submitBtn').disabled = false; // Enable submit button
+            })
+            .catch((error) => {
+                console.error("Error verifying OTP:", error);
+                document.getElementById('otpError').textContent = "Invalid OTP. Please try again.";
+            });
+    }
+
+    document.getElementById("teacherForm").addEventListener("submit", async function(event) {
+        event.preventDefault();
+        const formData = new FormData(event.target);
+
+        try {
+            const response = await fetch("https://script.google.com/macros/s/AKfycbyvgFBXuIedLVOylggoy5qYjkkTYL4SxzE8kQCFyj9VzowHMn8k9BK-DtKrgY7OBp0W/exec", { // Replace with your Web App URL
+                method: "POST",
+                body: formData
+            });
+            const result = await response.json();
+            if (result.status === 'success') {
+                alert("Form submitted successfully! We will contact you soon.");
+                event.target.reset();
+                // Reset the form and re-disable the submit button
+                document.getElementById('submitBtn').disabled = true;
+                document.getElementById('phone').disabled = false;
+                document.querySelector('button[onclick="sendOTP()"]').disabled = false;
+            } else {
+                alert("Error: " + result.message);
+            }
+        } catch (error) {
+            console.error("Error submitting form:", error);
+            alert("An error occurred while submitting the form. Please try again later.");
+        }
+    });
+</script>
+</body>
+</html>
